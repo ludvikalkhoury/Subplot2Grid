@@ -22,7 +22,7 @@ long_description = (HERE2 / "long_description.txt").read_text()
 
 
 def get_version():
-	version_file = os.path.join(os.path.dirname(__file__), 'PyGrabIt', 'Library.py')
+	version_file = os.path.join(os.path.dirname(__file__), 'Subplot2Grid', 'Subplot2Grid.py')
 	with open(version_file, 'r') as f:
 		for line in f:
 			if line.strip().startswith('version'):
@@ -31,20 +31,20 @@ def get_version():
 				print('Version ' + version)
 				return version
 				
-	raise ValueError("Version not found in PyGrabIt/Library.py")
+	raise ValueError("Version not found in Subplot2Grid/Subplot2Grid.py")
 
 
 
-setup_args = dict(name='PyGrabIt',
+setup_args = dict(name='Subplot2Grid',
 package_dir={ '' : package_dir },
 	  version=get_version(), # @VERSION_INFO@
-	  description='Python implementation of grabit toolbox.',
+	  description='Tool to manually draw subplots for Subplot2Grid.',
 	  long_description=long_description,
-	  url='https://github.com/ludvikalkhoury/PyGrabIt.git',
+	  url='https://github.com/ludvikalkhoury/Subplot2Grid.git',
 	  author='Ludvik Alkhoury',
 	  author_email='Ludvik.Alkhoury@gmail.com',
-	  packages=['PyGrabIt'],
-	  install_requires=['Pillow>=9.4.0'])
+	  packages=['Subplot2Grid'],
+	  install_requires=['pyperclip==1.9.0', 'Pillow>=9.4.0'])
 	  
 	  
 if __name__ == '__main__' and getattr( sys, 'argv', [] )[ 1: ]:
@@ -57,4 +57,9 @@ Instead, it is used as follows:
 	python -m pip install -e  "%s"
 
 """ % HERE )
+
+
+	  
+	  
+
 

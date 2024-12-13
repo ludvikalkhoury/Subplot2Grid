@@ -1,0 +1,10 @@
+README.md
+setup.py
+./Subplot2Grid/Subplot2Grid.py
+./Subplot2Grid/__init__.py
+./Subplot2Grid/__main__.py
+Subplot2Grid.egg-info/PKG-INFO
+Subplot2Grid.egg-info/SOURCES.txt
+Subplot2Grid.egg-info/dependency_links.txt
+Subplot2Grid.egg-info/requires.txt
+Subplot2Grid.egg-info/top_level.txt

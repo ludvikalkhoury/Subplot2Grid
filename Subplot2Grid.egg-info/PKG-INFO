@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: Subplot2Grid
+Version: 0.0.1
+Summary: Tool to manually draw subplots for Subplot2Grid.
+Home-page: https://github.com/ludvikalkhoury/Subplot2Grid.git
+Author: Ludvik Alkhoury
+Author-email: Ludvik.Alkhoury@gmail.com
+Requires-Dist: pyperclip==1.9.0
+Requires-Dist: Pillow>=9.4.0
+
+Subplot2Grid is a Python tool used to manually draw subplots for Subplot2Grid. 
+
+
+
+To install this package, use:
+``pip install Subplot2Grid``
+
+Then to run it, use:
+``python -m Subplot2Grid``
