@@ -1,0 +1,18 @@
+PyGrabIt is a Python implementation of the Matlab toolbox GRABIT. 
+
+This version contains the following tools:    
+
+1) Open Magnifier: This will open a new window with a magnifier around the cursor. The user can change the magnifier size as well as the zoom factor.
+
+2) Color Panel: The user can choose the curve color from which the points are captured from a color panel. Once the color is selected, a new window will open with the selected color and a capture button to automatically capture the points. 
+
+3) Auto Detect: This tool also automatically captures the points. However, the user can click on the curve, and its color will be automatically captured. 
+
+4) Fit Data: This tool performs a polynomial curve fitting. 
+
+
+To install this package, use:
+``pip install PyGrabIt``
+
+Then to run it, use:
+``python -m PyGrabIt``
