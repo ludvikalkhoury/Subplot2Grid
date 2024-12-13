@@ -40,6 +40,12 @@ class Subplot2Grid:
 		self.canvas.bind("<B1-Motion>", self.draw_rectangle)
 		self.canvas.bind("<ButtonRelease-1>", self.finish_draw)
 		self.canvas.bind("<Button-3>", self.remove_rectangle)  # Right-click event
+		
+		self.canvas.bind("<Button-2>", self.start_move)  # Middle-click event
+		self.canvas.bind("<B2-Motion>", self.move_rectangle)  # Middle-click drag
+
+		self.canvas.focus_set()  # To catch key events like pressing 'm'
+
 
 		# Controls for resizing canvas and setting cell size
 		self.width_size_label = tk.Label(master, text="Figure Width (px):")
@@ -99,29 +105,120 @@ class Subplot2Grid:
 
 	def start_draw(self, event):
 		# Record the starting point of the rectangle
-		self.start_x = event.x
-		self.start_y = event.y
+		self.start_x = (event.x // self.cell_size) * self.cell_size
+		self.start_y = (event.y // self.cell_size) * self.cell_size
 
+
+
+	def create_rectangle(self, x0, y0, x1, y1):
+		"""Create a rectangle and store its ID."""
+		rect_id = self.canvas.create_rectangle(x0, y0, x1, y1, outline="blue")
+		self.rectangles.append(rect_id)
+		print(f"Rectangle created with ID: {rect_id}")
+	
+	
 	def draw_rectangle(self, event):
 		# Draw a temporary rectangle as the mouse moves
-		self.canvas.delete("temp_rectangle")
-		self.canvas.create_rectangle(self.start_x, self.start_y, event.x, event.y, outline="blue", tags="temp_rectangle")
+		current_x = (event.x // self.cell_size) * self.cell_size
+		current_y = (event.y // self.cell_size) * self.cell_size
 
-	def finish_draw(self, event):
-		# Finalize the rectangle
+		# Draw a temporary rectangle
 		self.canvas.delete("temp_rectangle")
-		rect = self.canvas.create_rectangle(self.start_x, self.start_y, event.x, event.y, outline="blue", fill="blue", stipple="gray50")
-		self.rectangles.append((self.start_x, self.start_y, event.x, event.y))
+		self.canvas.create_rectangle(
+			self.start_x, self.start_y, current_x, current_y,
+			outline="blue", tags="temp_rectangle"
+		)
+		
+		
+		
+	def finish_draw(self, event):
+		# Snap the final mouse position to the nearest grid corner
+		end_x = (event.x // self.cell_size) * self.cell_size
+		end_y = (event.y // self.cell_size) * self.cell_size
+
+		# Calculate the width and height of the rectangle
+		width = abs(end_x - self.start_x)
+		height = abs(end_y - self.start_y)
+
+		# Only finalize the rectangle if the width is greater than or equal to one cell size
+		if width >= self.cell_size and height >= self.cell_size:
+			# Finalize the rectangle and create the rectangle on the canvas
+			self.canvas.delete("temp_rectangle")
+			rect_id = self.canvas.create_rectangle(
+				self.start_x, self.start_y, end_x, end_y,
+				outline="blue", fill="blue", stipple="gray50"
+			)
+			# Append the rectangle details to the list with the rect_id
+			self.rectangles.append((rect_id, self.start_x, self.start_y, end_x, end_y))
+		else:
+			# Show a message or simply ignore if the rectangle is too thin
+			print("Rectangle too thin, not added.")
+
+
 
 	def remove_rectangle(self, event):
-		# Check if right-click is inside any rectangle
-		for idx, rect in enumerate(self.rectangles):
-			x0, y0, x1, y1 = rect
+		"""Remove the rectangle under the mouse pointer on right-click."""
+		for idx, (rect_id, x0, y0, x1, y1) in enumerate(self.rectangles):
+			# Check if the event position is inside the rectangle
 			if x0 <= event.x <= x1 and y0 <= event.y <= y1:
-				# Remove the rectangle from the canvas and list
-				self.canvas.delete(self.canvas.find_overlapping(x0, y0, x1, y1)[0])
+				# Delete the rectangle from the canvas
+				self.canvas.delete(rect_id)
+				# Remove the rectangle from the list
 				del self.rectangles[idx]
+				print(f"Rectangle with ID {rect_id} removed.")
 				break
+		else:
+			print("No rectangle found at the click position.")
+
+
+	def start_move(self, event):
+		# Start moving a rectangle with middle-click
+		for idx, (rect_id, x0, y0, x1, y1) in enumerate(self.rectangles):
+			if x0 <= event.x <= x1 and y0 <= event.y <= y1:
+				self.selected_rect = (rect_id, x0, y0, x1, y1)
+				self.offset_x = event.x - x0
+				self.offset_y = event.y - y0
+				break
+	
+	def move_rectangle(self, event):
+		# Move the selected rectangle with middle-click dragging
+		if self.selected_rect:
+			rect_id, x0, y0, x1, y1 = self.selected_rect
+			
+			dx = event.x - self.offset_x - x0
+			dy = event.y - self.offset_y - y0
+			
+			# Snap the mouse position to the grid (cell size)
+			snap_x = (event.x // self.cell_size) * self.cell_size
+			snap_y = (event.y // self.cell_size) * self.cell_size
+			
+			# Find the closest corner to snap the rectangle to
+			corners = [(x0, y0), (x1, y0), (x0, y1), (x1, y1)]
+			closest_corner = min(corners, key=lambda corner: (corner[0] - snap_x) ** 2 + (corner[1] - snap_y) ** 2)
+
+			# Calculate the new position for the rectangle based on the closest corner
+			snap_dx = closest_corner[0] - x0
+			snap_dy = closest_corner[1] - y0
+
+			# Apply snapping adjustments to the rectangle's coordinates
+			new_x0 = snap_x
+			new_y0 = snap_y
+			new_x1 = new_x0 + (x1 - x0)
+			new_y1 = new_y0 + (y1 - y0)
+		
+			self.canvas.coords(rect_id, new_x0, new_y0, new_x1, new_y1)
+			
+			# Update the position in the rectangles list
+			for i, rect in enumerate(self.rectangles):
+				if rect[0] == rect_id:
+					self.rectangles[i] = (rect_id, new_x0, new_y0, new_x1, new_y1)
+					break  # Found and updated the matching rectangle
+			
+			# Update the offset values for the next movement
+			self.offset_x = event.x - new_x0
+			self.offset_y = event.y - new_y0
+
+
 
 	def update_canvas(self):
 		
@@ -157,7 +254,7 @@ class Subplot2Grid:
 		rects_with_positions = []
 
 		for idx, rect in enumerate(self.rectangles, start=1):
-			x0, y0, x1, y1 = rect
+			_, x0, y0, x1, y1 = rect
 			# Determine grid position and span for the rectangle
 			row_start = int(min(y0, y1) / self.cell_size)
 			row_span = int(abs(y1 - y0) / self.cell_size)
@@ -180,7 +277,7 @@ class Subplot2Grid:
 			if show_message:
 				self.show_code_popup(code_str)
 				
-			 # Ask the user if they want to save the generated code as a .txt file
+			# Ask the user if they want to save the generated code as a .txt file
 			save_option = messagebox.askyesno("Save Code", "Would you like to save the generated code to a .txt file?")
 			if save_option:
 				file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
@@ -232,7 +329,7 @@ class Subplot2Grid:
 		exec('import matplotlib.pyplot as plt', globals())
 		for line in self.code_lines:
 			exec(line, globals())
-	   
+
 		axis_names = re.findall(r'ax\d+', '\n'.join(self.code_lines))
 
 		# Turn off x and y ticks for each axis automatically
