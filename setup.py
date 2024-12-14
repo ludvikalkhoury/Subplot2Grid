@@ -21,6 +21,7 @@ long_description = (HERE2 / "long_description.txt").read_text()
 
 
 
+
 def get_version():
 	version_file = os.path.join(os.path.dirname(__file__), 'Subplot2Grid', 'Subplot2Grid.py')
 	with open(version_file, 'r') as f:
@@ -51,7 +52,7 @@ if __name__ == '__main__' and getattr( sys, 'argv', [] )[ 1: ]:
 	setuptools.setup( **setup_args )
 else:
 	sys.stderr.write( """
-The `PyGrabIt` setup.py file should not be run or imported directly.
+The `Subplot2Grid` setup.py file should not be run or imported directly.
 Instead, it is used as follows:
 
 	python -m pip install -e  "%s"
