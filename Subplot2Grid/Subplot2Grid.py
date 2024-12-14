@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox, filedialog, Toplevel
 import re
 import sys 
 import os
@@ -66,20 +66,53 @@ class Subplot2Grid:
 		self.cell_size_entry.insert(0, str(self.cell_size))
 		self.cell_size_entry.grid(row=3, column=1)
 
-		self.update_btn = tk.Button(master, text="Update Canvas", command=self.update_canvas)
-		self.update_btn.grid(row=4, column=0, columnspan=2, pady=10)
+		
 
 		# Buttons
-		self.generate_btn = tk.Button(master, text="Generate Code", command=self.generate_code)
-		self.generate_btn.grid(row=5, column=0, pady=10)
-
-		self.reset_btn = tk.Button(master, text="Reset", command=self.reset_canvas)
-		self.reset_btn.grid(row=5, column=1, pady=10)
-
+		self.update_btn = tk.Button(master, text="Update Canvas", command=self.update_canvas)
+		self.update_btn.grid(row=4, column=0, columnspan=1, pady=10)
+		
 		self.grid_map_btn = tk.Button(master, text="Generate Grid Map Image", command=self.generate_grid_map_image)
-		self.grid_map_btn.grid(row=6, column=0, columnspan=2, pady=10)
+		self.grid_map_btn.grid(row=4, column=1, columnspan=1, pady=10)
+		
+		
+		self.generate_btn = tk.Button(master, text="Generate Code", command=self.generate_code)
+		self.generate_btn.grid(row=4, column=2, pady=10)
+		
+		self.help_btn = tk.Button(master, text="help", command=self.display_help_message)
+		self.help_btn.grid(row=4, column=3, pady=10)
+		
+		#self.reset_btn = tk.Button(master, text="Reset", command=self.reset_canvas)
+		#self.reset_btn.grid(row=5, column=1, pady=10)
+
+		
 		
 		self.draw_grid_lines()
+		
+	
+	def display_help_message(self):
+		# Create a new top-level window
+		help_window = Toplevel(self.master)
+		help_window.title("Help")
+		
+		self.help_text = (
+			"Subplot2Grid is a tool that helps you design subplot layouts and generate corresponding code.\n\n"
+			"Instructions:\n"
+			"- Use the left mouse button to draw a rectangle on the canvas.\n"
+			"- Use the right mouse button to delete a rectangle.\n"
+			"- Use the middle mouse button to move and adjust the rectangle's placement.\n\n"
+			"Features:\n"
+			"- Generate and save the Python code for your layout.\n"
+			"- Export a template image of the grid to remember labels and subplots."
+			)	
+		
+		# Add a label with the help message
+		help_message = tk.Label(help_window, text=self.help_text, wraplength=400, justify="left")
+		help_message.pack(padx=20, pady=20)
+
+		# Add a close button
+		close_button = tk.Button(help_window, text="Close", command=help_window.destroy)
+		close_button.pack(pady=10)
 		
 		
 	def resource_path(self, relative_path):
@@ -272,7 +305,7 @@ class Subplot2Grid:
 			code_lines.append(f"ax{idx} = plt.subplot2grid(({self.row_grid_size}, {self.col_grid_size}), "
 							  f"({row_start}, {col_start}), rowspan={row_span}, colspan={col_span})")
 
-		if code_lines:
+		if len(code_lines) > 1:
 			code_str = "\n".join(code_lines)
 			if show_message:
 				self.show_code_popup(code_str)
@@ -290,7 +323,7 @@ class Subplot2Grid:
 						messagebox.showerror("Error", f"Error saving file: {e}")
 		
 		else:
-			messagebox.showwarning("No Rectangles", "No rectangles drawn to generate code.")
+			messagebox.showwarning("No Rectangles", "No rectangles drawn to generate code or grid map image.")
 
 		self.code_lines = code_lines
 
@@ -322,36 +355,44 @@ class Subplot2Grid:
 		self.draw_grid_lines()
 
 	def generate_grid_map_image(self):
+		
+		
 		import matplotlib.pyplot as plt
+		
 		# Execute each line to create the figure and axes dynamically
 		self.generate_code(show_message=False)
-		
-		exec('import matplotlib.pyplot as plt', globals())
-		for line in self.code_lines:
-			exec(line, globals())
 
-		axis_names = re.findall(r'ax\d+', '\n'.join(self.code_lines))
 
-		# Turn off x and y ticks for each axis automatically
-		for axis_name in axis_names:
-			# Access the axis object dynamically
-			axis = globals().get(axis_name)  # Fetch the axis object (e.g., ax1, ax2, etc.)
+		if len(self.code_lines) > 1:
 			
-			if axis:  # Make sure the axis object exists
-				axis.text(0,0,axis_name, fontsize=6)
-				axis.set_xticks([])  # Turn off x-axis ticks
-				axis.set_yticks([])  # Turn off y-axis ticks
+			exec('import matplotlib.pyplot as plt', globals())
+			for line in self.code_lines:
+				exec(line, globals())
+
+			axis_names = re.findall(r'ax\d+', '\n'.join(self.code_lines))
+
+			# Turn off x and y ticks for each axis automatically
+			for axis_name in axis_names:
+				# Access the axis object dynamically
+				axis = globals().get(axis_name)  # Fetch the axis object (e.g., ax1, ax2, etc.)
 				
-	
-		plt.show()
+				if axis:  # Make sure the axis object exists
+					axis.text(0,0,axis_name, fontsize=6)
+					axis.set_xticks([])  # Turn off x-axis ticks
+					axis.set_yticks([])  # Turn off y-axis ticks
+					
 		
-		# Save the plot to a file (ask for the filename and format)
-		save_option = messagebox.askyesno("Save Image", "Would you like to save the image?")
-		if save_option:
-			file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All files", "*.*")])
-			if file_path:
-				plt.savefig(file_path)
-				messagebox.showinfo("Saved", f"Image saved to {file_path}")
+			plt.show()
+			
+			# Save the plot to a file (ask for the filename and format)
+			save_option = messagebox.askyesno("Save Image", "Would you like to save the image?")
+			if save_option:
+				file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All files", "*.*")])
+				if file_path:
+					plt.savefig(file_path)
+					messagebox.showinfo("Saved", f"Image saved to {file_path}")
+
+
 
 # Run the application
 if __name__ == "__main__":

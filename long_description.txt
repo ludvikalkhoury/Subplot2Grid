@@ -1,7 +1,6 @@
 Subplot2Grid is a Python tool used to manually draw subplots for Subplot2Grid. 
 
 
-
 To install this package, use:
 ``pip install Subplot2Grid``
 
