@@ -1,9 +1,9 @@
 # Subplot2Grid
 Subplot2Grid is a tool that helps you design subplot layouts and generate corresponding code.
 
-To install this package, use: pip install Subplot2Grid
+To install this package, use: `pip install Subplot2Grid`
 
-Then to run it, use: python -m Subplot2Grid
+Then to run it, use: `python -m Subplot2Grid`
 
 How to use: 
 - Use the left mouse button to draw a rectangle on the canvas.  
