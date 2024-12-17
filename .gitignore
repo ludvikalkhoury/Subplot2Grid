@@ -5,5 +5,5 @@
 *.pyc
 *.egg-info
 *.pypirc*
-
+*LA*
 
