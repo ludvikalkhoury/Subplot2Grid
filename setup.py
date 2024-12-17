@@ -45,6 +45,8 @@ package_dir={ '' : package_dir },
 	  author='Ludvik Alkhoury',
 	  author_email='Ludvik.Alkhoury@gmail.com',
 	  packages=['Subplot2Grid'],
+	  package_data={'Subplot2Grid': ['s2g.ico']},
+	  include_package_data=True,
 	  install_requires=['pyperclip==1.9.0', 'Pillow>=9.4.0'])
 	  
 	  

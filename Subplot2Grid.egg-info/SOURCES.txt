@@ -4,6 +4,7 @@ setup.py
 ./Subplot2Grid/Subplot2Grid.py
 ./Subplot2Grid/__init__.py
 ./Subplot2Grid/__main__.py
+./Subplot2Grid/s2g.ico
 Subplot2Grid/Subplot2Grid.py
 Subplot2Grid/__init__.py
 Subplot2Grid/__main__.py

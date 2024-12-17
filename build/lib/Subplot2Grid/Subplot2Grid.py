@@ -9,7 +9,7 @@ import pyperclip
 
 
 class Subplot2Grid:
-	version = "0.0.1"
+	version = "0.0.3"
 	def __init__(self, master):
 		self.master = master
 		self.master.title("Subplot2Grid Generator!")

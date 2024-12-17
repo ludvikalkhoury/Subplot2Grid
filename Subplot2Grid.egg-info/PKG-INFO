@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Subplot2Grid
-Version: 0.0.1
+Version: 0.0.3
 Summary: Tool to manually draw subplots for Subplot2Grid.
 Home-page: https://github.com/ludvikalkhoury/Subplot2Grid.git
 Author: Ludvik Alkhoury
@@ -18,11 +18,17 @@ Then to run it, use:
 ``python -m Subplot2Grid``
 
 
-How to use:
-- Use the left mouse button to draw a rectangle on the canvas.
-- Use the right mouse button to delete a rectangle.
-- Use the middle mouse button to move and adjust the rectangle's placement.
+How to use:	 
 
-Features:
-- Generate and save the Python code for your layout.
-- Export a template image of the grid to remember labels and subplots.
+- Use the left mouse button to draw a rectangle on the canvas.	
+
+- Use the right mouse button to delete a rectangle.	
+
+- Use the middle mouse button to move and adjust the rectangle's placement.	
+
+
+Features:	
+
+- Generate and save the Python code for your layout.	
+
+- Export a template image of the grid to remember labels and subplots.	
